@@ -21,7 +21,7 @@ warnings.filterwarnings('ignore')
 
 #LOAD AND PREPARE DATA
 print("Loading data...")
-df = pd.read_csv('data_shared_Diabetes project.csv')
+df = pd.read_csv('FProject/data_shared_Diabetes project.csv)
 
 features = [
     'FBG',
