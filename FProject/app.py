@@ -13,7 +13,7 @@ from io import BytesIO
 
 # Load the image from GitHub's raw URL
 try:
-    icon_url = "https://raw.githubusercontent.com/Anjie-c/Anjolaoluwa-s-Final/main/FProject/Dashboard%20project.png"
+    icon_url = "https://raw.githubusercontent.com/Anjie-c/Anjolaoluwa-s-Final/main/FProject/Dashboard project.png"
     response = requests.get(icon_url)
     img = Image.open(BytesIO(response.content))
 except:
@@ -25,12 +25,6 @@ st.set_page_config(
     layout="wide"
 )
 
-# Page setup
-st.set_page_config(
-    page_title="Diabetes Prediction System",
-    page_icon=img,
-    layout="wide"
-)
 
 # Custom CSS for sidebar navigation
 st.markdown("""
