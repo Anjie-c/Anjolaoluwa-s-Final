@@ -11,7 +11,6 @@ import base64
 from PIL import Image
 from io import BytesIO
 
-img = Image.open('assets.jpg')
 img = Image.open('Dashboard project.png')
 
 # Page setup
