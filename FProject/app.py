@@ -11,7 +11,19 @@ import base64
 from PIL import Image
 from io import BytesIO
 
-img = Image.open('Dashboard project.png')
+# Load the image from GitHub's raw URL
+try:
+    icon_url = "https://raw.githubusercontent.com/Anjie-c/Anjolaoluwa-s-Final/main/FProject/Dashboard%20project.png"
+    response = requests.get(icon_url)
+    img = Image.open(BytesIO(response.content))
+except:
+    img = None  # Fallback if image fails
+
+st.set_page_config(
+    page_title="Diabetes Prediction System",
+    page_icon=img if img else "🏥",  # Use emoji as fallback
+    layout="wide"
+)
 
 # Page setup
 st.set_page_config(
