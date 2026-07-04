@@ -149,6 +149,7 @@ def load_data():
        BASE_DIR = Path(__file__).resolve().parent
        DATA_FILE = BASE_DIR / "data_shared_Diabetes project.csv"
        df = pd.read_csv(DATA_FILE)
+       return df
     except Exception as e:
         st.error(f"Error loading data: {e}")
         return None
