@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from pathlib import Path
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.ensemble import RandomForestClassifier, StackingClassifier
 from sklearn.tree import DecisionTreeClassifier
@@ -21,8 +22,8 @@ warnings.filterwarnings('ignore')
 
 #LOAD AND PREPARE DATA
 print("Loading data...")
-df = pd.read_csv('FProject/data_shared_Diabetes project.csv)
-
+BASE_DIR = Path(__file__).resolve().parent
+df = pd.read_csv(BASE_DIR / "data_shared_Diabetes project.csv")
 features = [
     'FBG',
     'HbA1c',

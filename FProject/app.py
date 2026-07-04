@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+from pathlib import Path
 import joblib
 import plotly.express as px
 import plotly.graph_objects as go
@@ -145,8 +146,9 @@ def add_to_history(patient_data, prediction, probability):
 @st.cache_data
 def load_data():
     try:
-        df = pd.read_csv('data_shared_Diabetes project.csv')
-        return df
+       BASE_DIR = Path(__file__).resolve().parent
+       DATA_FILE = BASE_DIR / "data_shared_Diabetes project.csv"
+       df = pd.read_csv(DATA_FILE)
     except Exception as e:
         st.error(f"Error loading data: {e}")
         return None
