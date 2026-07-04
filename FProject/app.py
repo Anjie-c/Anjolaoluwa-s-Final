@@ -12,6 +12,8 @@ import base64
 from PIL import Image
 from io import BytesIO
 
+BASE_DIR = Path(__file__).resolve().parent
+MODELS_DIR = BASE_DIR / "models"
 # Load the image from GitHub's raw URL
 try:
     icon_url = "https://raw.githubusercontent.com/Anjie-c/Anjolaoluwa-s-Final/main/FProject/Dashboard project.png"
@@ -159,17 +161,20 @@ def load_data():
 @st.cache_resource
 def load_models():
     try:
-        stacking_model = joblib.load('models/stacking_model.pkl')
-        lr_model = joblib.load('models/lr_model.pkl')
-        dt_model = joblib.load('models/dt_model.pkl')
-        rf_model = joblib.load('models/rf_model.pkl')
-        scaler = joblib.load('models/scaler.pkl')
-        feature_names = joblib.load('models/feature_names.pkl')
+        stacking_model = joblib.load(MODELS_DIR / "stacking_model.pkl")
+        lr_model = joblib.load(MODELS_DIR / "lr_model.pkl")
+        dt_model = joblib.load(MODELS_DIR / "dt_model.pkl")
+        rf_model = joblib.load(MODELS_DIR / "rf_model.pkl")
+        scaler = joblib.load(MODELS_DIR / "scaler.pkl")
+        feature_names = joblib.load(MODELS_DIR / "feature_names.pkl")
+
         return stacking_model, lr_model, dt_model, rf_model, scaler, feature_names
+
     except FileNotFoundError as e:
         st.error(f"Model file not found: {e}")
         st.info("Please run 'python train.py' first to train the model.")
         return None, None, None, None, None, None
+
     except Exception as e:
         st.error(f"Error loading model: {e}")
         return None, None, None, None, None, None
@@ -179,14 +184,16 @@ def load_models():
 @st.cache_resource
 def load_model():
     try:
-        model = joblib.load('models/stacking_model.pkl')
-        scaler = joblib.load('models/scaler.pkl')
-        feature_names = joblib.load('models/feature_names.pkl')
+        model = joblib.load(MODELS_DIR / "stacking_model.pkl")
+        scaler = joblib.load(MODELS_DIR / "scaler.pkl")
+        feature_names = joblib.load(MODELS_DIR / "feature_names.pkl")
+
         return model, scaler, feature_names
+
     except FileNotFoundError as e:
         st.error(f"Model file not found: {e}")
-        st.info("Please run 'python train.py' first to train the model.")
         return None, None, None
+
     except Exception as e:
         st.error(f"Error loading model: {e}")
         return None, None, None
@@ -221,7 +228,6 @@ def sidebar():
     st.sidebar.markdown("Medical Disclaimer: For clinical support only")
 
 
-# DASHBOARD PAGE
 def dashboard_page():
     st.markdown("Diabetes Data Dashboard")
 
@@ -241,13 +247,15 @@ def dashboard_page():
                 st.metric("Diabetes Rate", f"{diabetes_rate:.1f}%")
         with col4:
             if 'ResidentUrbanRural' in df.columns:
-                urban_count = (df['ResidentUrbanRural'] == 2).sum()  # No quotes around 1
+                urban_count = (df['ResidentUrbanRural'] == 2).sum()
                 st.metric("Urban Patients", urban_count)
 
         st.markdown("---")
 
         # Check for model metrics graphs
         st.markdown("Model Evaluation Metrics")
+
+        # Use MODELS_DIR consistently
         metrics_files = [
             'confusion_matrix.png',
             'roc_curve.png',
@@ -258,45 +266,46 @@ def dashboard_page():
             'cv_scores.png'
         ]
 
-        metrics_exist = all([os.path.exists(f'models/{f}') for f in metrics_files])
+        # Check if metrics exist using MODELS_DIR
+        metrics_exist = all([(MODELS_DIR / f).exists() for f in metrics_files])
 
         if metrics_exist:
             # Row 1: Confusion Matrix + Metrics Comparison
             col1, col2 = st.columns(2)
             with col1:
-                st.image('models/confusion_matrix.png', use_container_width=True, caption='Confusion Matrix')
+                st.image(str(MODELS_DIR / 'confusion_matrix.png'), use_container_width=True, caption='Confusion Matrix')
             with col2:
-                st.image('models/metrics_comparison.png', use_container_width=True, caption='Performance Metrics')
+                st.image(str(MODELS_DIR / 'metrics_comparison.png'), use_container_width=True, caption='Performance Metrics')
 
             # Row 2: ROC Curve + PR Curve
             col1, col2 = st.columns(2)
             with col1:
-                st.image('models/roc_curve.png', use_container_width=True, caption='ROC Curve')
+                st.image(str(MODELS_DIR / 'roc_curve.png'), use_container_width=True, caption='ROC Curve')
             with col2:
-                st.image('models/pr_curve.png', use_container_width=True, caption='Precision-Recall Curve')
+                st.image(str(MODELS_DIR / 'pr_curve.png'), use_container_width=True, caption='Precision-Recall Curve')
 
             # Row 3: Accuracy Comparison + Feature Importance
             col1, col2 = st.columns(2)
             with col1:
-                st.image('models/model_accuracy_comparison.png', use_container_width=True,
+                st.image(str(MODELS_DIR / 'model_accuracy_comparison.png'), use_container_width=True,
                          caption='Model Accuracy Comparison')
             with col2:
-                st.image('models/feature_importance.png', use_container_width=True, caption='Feature Importance')
+                st.image(str(MODELS_DIR / 'feature_importance.png'), use_container_width=True, caption='Feature Importance')
 
             # Row 4: CV Scores + Classification Report
             col1, col2 = st.columns(2)
             with col1:
-                st.image('models/cv_scores.png', use_container_width=True, caption='Cross-Validation Scores')
+                st.image(str(MODELS_DIR / 'cv_scores.png'), use_container_width=True, caption='Cross-Validation Scores')
             with col2:
-                if os.path.exists('models/classification_report_heatmap.png'):
-                    st.image('models/classification_report_heatmap.png', use_container_width=True,
+                if (MODELS_DIR / 'classification_report_heatmap.png').exists():
+                    st.image(str(MODELS_DIR / 'classification_report_heatmap.png'), use_container_width=True,
                              caption='Classification Report')
         else:
             st.info("Run 'python train.py' to generate evaluation metrics graphs.")
 
         st.markdown("---")
 
-        # Geographic Clustering
+        # Geographic Clustering - MOVED INSIDE THE if df is not None: block
         st.markdown("Geographic View of Diabetes")
 
         if 'ResidentUrbanRural' in df.columns and 'DiabetesType' in df.columns:
@@ -341,7 +350,7 @@ def dashboard_page():
             fig.update_layout(height=500)
             st.plotly_chart(fig, use_container_width=True)
 
-        # charts
+        # charts - MOVED INSIDE THE if df is not None: block
         st.markdown("---")
         st.markdown("Data Visualizations")
 
@@ -361,14 +370,36 @@ def dashboard_page():
         st.markdown("---")
         st.subheader("Power BI Dashboard")
 
-        st.image(
-            "Dashboard project.png",
-            caption="Diabetes Analytics Dashboard",
-            use_container_width=True
-        )
+        # Try to load the image from the correct path
+        try:
+            # Check if the image exists in the current directory
+            image_path = BASE_DIR / "Dashboard project.png"
+            if image_path.exists():
+                st.image(
+                    str(image_path),
+                    caption="Diabetes Analytics Dashboard",
+                    use_container_width=True
+                )
+            else:
+                st.warning("Dashboard image not found locally.")
+                # Try loading from GitHub as fallback
+                try:
+                    icon_url = "https://raw.githubusercontent.com/Anjie-c/Anjolaoluwa-s-Final/main/FProject/Dashboard%20project.png"
+                    response = requests.get(icon_url)
+                    if response.status_code == 200:
+                        img = Image.open(BytesIO(response.content))
+                        st.image(img, caption="Diabetes Analytics Dashboard", use_container_width=True)
+                    else:
+                        st.info("Power BI dashboard image not available")
+                except:
+                    st.info("Power BI dashboard image not available")
+        except Exception as e:
+            st.info("Power BI dashboard image not available")
 
         with st.expander("View Raw Data"):
             st.dataframe(df, use_container_width=True)
+    else:
+        st.error("Could not load data. Please check if the data file exists.")
 
 
 # SINGLE PREDICTION PAGE
